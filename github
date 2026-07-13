@@ -1,0 +1,155 @@
+Remove legacy future annotation imports (#982)
+## Problem
+
+Python 3.14 provides native lazy annotations, but the codebase still
+relied on legacy future annotation imports. Those imports also made
+type-only import cycles easier to hide instead of fixing ownership
+boundaries.
+
+## Changes
+
+| Before | After |
+| --- | --- |
+| Python files used `from __future__ import annotations`. | Python files
+rely on Python 3.14 native lazy annotations. |
+| Some runtime modules used `TYPE_CHECKING` or local imports for
+required dependencies. | Runtime modules use top-level owner-module
+imports with explicit boundaries. |
+| Local and GitHub guardrails only rejected type ignore suppressions. |
+Local and GitHub guardrails reject type ignore suppressions and legacy
+future annotation imports. |
+| Agent docs only documented the no-type-ignore rule. | Agent docs
+document the Python 3.14 annotation and import-boundary rules. |
+
+<!-- greptile_comment -->
+
+<details open><summary><h3>Greptile Summary</h3></summary>
+
+This PR moves the codebase to Python 3.14 native lazy annotations. The
+main changes are:
+
+- Removed legacy `from __future__ import annotations` imports across
+Python modules.
+- Promoted selected runtime dependencies from `TYPE_CHECKING` or local
+imports to explicit owner-module imports.
+- Added local, GitHub, and contract-test guardrails to reject legacy
+future annotation imports.
+- Updated agent docs with the annotation and import-boundary rules.
+- Bumped the package patch version for production-file changes.
+</details>
+
+<h3>Confidence Score: 5/5</h3>
+
+Safe to merge with low risk.
+
+The changes are mostly mechanical annotation cleanup with matching CI
+and contract-test guardrails. Reviewed import-boundary updates did not
+show a confirmed runtime cycle or dependency break.
+
+No files require special attention.
+
+<details><summary><h3><a href="https://www.greptile.com/trex"><img
+alt="T-Rex"
+src="https://greptile-static-assets.s3.amazonaws.com/trex/trex_green.svg"
+height="20" align="absmiddle"></a> T-Rex Logs</h3></summary>
+
+**What T-Rex did**
+- Performed an end-to-end validation of the guardrail contract suite: an
+environment check confirmed uv availability, a guardrail pytest run used
+CPython 3.14.0 with 5 passing contract tests, 3 focused CI-script tests
+passed, and the direct CI suppressions guardrail command (including the
+legacy future-annotations grep) also passed.
+
+<a
+href="https://app.greptile.com/trex/runs/13303335/artifacts"><picture><source
+media="(prefers-color-scheme: dark)"
+srcset="https://greptile-static-assets.s3.amazonaws.com/badges/ViewAllArtifactsDark.svg?v=4"><source
+media="(prefers-color-scheme: light)"
+srcset="https://greptile-static-assets.s3.amazonaws.com/badges/ViewAllArtifacts.svg?v=4"><img
+alt="View all artifacts"
+src="https://greptile-static-assets.s3.amazonaws.com/badges/ViewAllArtifacts.svg?v=4"></picture></a>
+
+<sub><a href="https://www.greptile.com/trex"><img alt="T-Rex"
+src="https://greptile-static-assets.s3.amazonaws.com/trex/trex_green.svg"
+height="14" align="absmiddle"></a> Ran code and verified through
+T-Rex</sub>
+</details>
+
+<details open><summary><h3>Important Files Changed</h3></summary>
+
+| Filename | Overview |
+|----------|----------|
+| api/runtime.py | Moves messaging, CLI manager, session, limiter, and
+tree dependencies from local/type-checking imports to explicit top-level
+owner-module imports. |
+| messaging/platforms/telegram.py | Removes future annotations and
+promotes Telegram SDK type imports into the existing availability guard.
+|
+| messaging/platforms/telegram_inbound.py | Removes future annotations
+and imports Telegram SDK types at module scope for inbound
+normalization. |
+| tests/contracts/test_import_boundaries.py | Adds an AST contract that
+rejects legacy future annotation imports across Python files. |
+| scripts/ci.sh | Extends the local suppression check to reject legacy
+future annotation imports alongside type-ignore suppressions. |
+| scripts/ci.ps1 | Mirrors the local PowerShell CI suppression check for
+legacy future annotations. |
+| .github/workflows/tests.yml | Renames and broadens the GitHub
+guardrail job to reject both type suppressions and legacy future
+annotations. |
+| pyproject.toml | Bumps the patch version for production-file changes.
+|
+
+</details>
+
+<details open><summary><h3>Sequence Diagram</h3></summary>
+
+<a href="#gh-light-mode-only">
+
+```mermaid
+%%{init: {'theme': 'neutral'}}%%
+sequenceDiagram
+participant Dev as Developer/CI
+participant Guard as Suppression guard
+participant AST as Import-boundary contract test
+participant Py as Python modules
+
+Dev->>Guard: Run local/GitHub suppression check
+Guard->>Py: "Scan *.py for type ignores and future annotations"
+Guard-->>Dev: Fail if legacy annotation import remains
+Dev->>AST: Run pytest contract tests
+AST->>Py: Parse imports with ast
+AST-->>Dev: Assert no future annotations/import-boundary violations
+Py-->>Dev: Use Python 3.14 native lazy annotations
+```
+
+</a>
+<a href="#gh-dark-mode-only">
+
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {"darkMode": true, "background": "#0d1117", "primaryColor": "#21262d", "primaryTextColor": "#e6edf3", "primaryBorderColor": "#8b949e", "lineColor": "#8b949e", "textColor": "#e6edf3", "edgeLabelBackground": "#161b22", "actorBkg": "#21262d", "actorBorder": "#8b949e", "actorTextColor": "#e6edf3", "actorLineColor": "#8b949e", "signalColor": "#8b949e", "signalTextColor": "#e6edf3", "noteBkgColor": "#373320", "noteBorderColor": "#d4a72c", "noteTextColor": "#f0e6c0", "labelBoxBkgColor": "#21262d", "labelBoxBorderColor": "#8b949e", "labelTextColor": "#e6edf3", "loopTextColor": "#e6edf3", "activationBkgColor": "#30363d", "activationBorderColor": "#8b949e"}}}%%
+sequenceDiagram
+participant Dev as Developer/CI
+participant Guard as Suppression guard
+participant AST as Import-boundary contract test
+participant Py as Python modules
+
+Dev->>Guard: Run local/GitHub suppression check
+Guard->>Py: "Scan *.py for type ignores and future annotations"
+Guard-->>Dev: Fail if legacy annotation import remains
+Dev->>AST: Run pytest contract tests
+AST->>Py: Parse imports with ast
+AST-->>Dev: Assert no future annotations/import-boundary violations
+Py-->>Dev: Use Python 3.14 native lazy annotations
+```
+
+</a>
+</details>
+
+<sub>Reviews (2): Last reviewed commit: ["Remove legacy future
+annotations
+import"](6e6cda6)
+| [Re-trigger
+Greptile](https://app.greptile.com/api/retrigger?id=41875785)</sub>
+
+<!-- /greptile_comment -->
