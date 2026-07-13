@@ -1,0 +1,30 @@
+
+Name	Last commit message	Last commit date
+..
+api
+Remove the native Anthropic provider transport (#1067)
+yesterday
+application
+Remove the native Anthropic provider transport (#1067)
+yesterday
+cli
+Fix cross-drive messaging startup with native Claude plan storage (#1085
+1 hour ago
+config
+Fix cross-drive messaging startup with native Claude plan storage (#1085
+1 hour ago
+core
+Consolidate OpenAI-compatible provider adapters (#1069)
+yesterday
+messaging
+Give messaging clear exact subtree semantics (#1072)
+19 hours ago
+providers
+Consolidate OpenAI-compatible provider adapters (#1069)
+yesterday
+runtime
+Fix cross-drive messaging startup with native Claude plan storage (#1085
+1 hour ago
+__init__.py
+Move runtime packages under src namespace (#1029)
+4 days ago
