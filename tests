@@ -1,0 +1,42 @@
+
+Name	Last commit message	Last commit date
+..
+api
+Remove the native Anthropic provider transport (#1067)
+yesterday
+application
+Remove the native Anthropic provider transport (#1067)
+yesterday
+cli
+Fix cross-drive messaging startup with native Claude plan storage (#1085
+1 hour ago
+config
+Fix cross-drive messaging startup with native Claude plan storage (#1085
+1 hour ago
+contracts
+Consolidate OpenAI-compatible provider adapters (#1069)
+yesterday
+core
+Remove the native Anthropic provider transport (#1067)
+yesterday
+messaging
+Give messaging clear exact subtree semantics (#1072)
+20 hours ago
+providers
+Make provider retry tests deterministic (#1070)
+yesterday
+runtime
+Fix cross-drive messaging startup with native Claude plan storage (#1085
+1 hour ago
+scripts
+Make installers native, fail-fast, and verifiable (#1086)
+9 minutes ago
+__init__.py
+Major refactor: API, providers, messaging, and Anthropic protocol
+3 months ago
+conftest.py
+Give messaging clear exact subtree semantics (#1072)
+20 hours ago
+provider_request_mocks.py
+Consolidate OpenAI-compatible provider adapters (#1069)
+yesterday
